@@ -261,9 +261,26 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
   .result-title{font-size:2.5rem;}
   .modal-box{padding:25px 20px;}
   .name-input{width:200px;}
-  #fightersScreen{flex-direction:column;padding:10px;}
-  .fighters-left{gap:8px;}
+  #fightersScreen{flex-direction:column;padding:10px;overflow:hidden;}
+  .fighters-left{gap:8px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+  .fighters-grid{overflow-y:auto;overflow-x:hidden;flex:1;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;padding-bottom:20px;}
+  .fighters-grid::-webkit-scrollbar{width:4px;}
+  .fighters-grid::-webkit-scrollbar-thumb{background:#00ff8855;border-radius:2px;}
   .filter-block{display:none;}
+  #fightersPageNav{display:none !important;}
+  /* Better tap targets on mobile */
+  .btn, .menu-btn, .back-btn, .buy-btn, .filter-btn, .device-btn {
+    -webkit-tap-highlight-color: rgba(255,255,255,0.15);
+    touch-action: manipulation;
+  }
+  .btn-fight{
+    min-height:54px;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:rgba(255,140,0,0.3);
+  }
+  .top-right-btns{align-items:flex-end;}
+  #musicControlMobile{display:flex !important;}
+  #musicControl{display:none !important;}
 }
 @media (max-width:480px){
   .logo{font-size:1.8rem;}
@@ -343,7 +360,15 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
   <div class="top-right-btns">
     <div class="straps-hud"><span class="straps-icon">💎</span><span id="strapsCount">0</span></div>
     <div class="straps-hud" style="border-color:#ff9944;color:#ff9944;"><span style="font-size:1.4rem;">⚡</span><span id="powerCount">0</span></div>
-    <button class="menu-btn menu-btn-settings" onclick="clickSound();showScreen('settingsScreen');initSettingsUI()">⚙️ НАСТРОЙКИ</button>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch;">
+      <button class="menu-btn menu-btn-settings" onclick="clickSound();showScreen('settingsScreen');initSettingsUI()" style="text-align:center;">⚙️ НАСТРОЙКИ</button>
+      <div id="musicControlMobile" style="display:none;background:rgba(0,0,0,0.6);border:1px solid #00ff8844;border-radius:12px;padding:5px 8px;align-items:center;justify-content:center;gap:6px;">
+        <button onclick="clickSound();prevTrack()" style="background:none;border:1px solid #00ff8844;border-radius:6px;color:#00ff88;cursor:pointer;padding:2px 7px;font-size:0.8rem;min-width:28px;min-height:28px;">◀</button>
+        <span style="color:#aaa;font-size:0.8rem;">🎵</span>
+        <span id="trackNameMobile" style="color:#00ff88;font-size:0.7rem;font-weight:900;min-width:60px;text-align:center;"></span>
+        <button onclick="clickSound();nextTrack()" style="background:none;border:1px solid #00ff8844;border-radius:6px;color:#00ff88;cursor:pointer;padding:2px 7px;font-size:0.8rem;min-width:28px;min-height:28px;">▶</button>
+      </div>
+    </div>
   </div>
   <!-- PASS METIK button -->
   <button onclick="clickSound();document.getElementById('passMetikModal').style.display='flex'" style="position:absolute;bottom:18px;right:18px;z-index:10;padding:10px 22px;background:linear-gradient(135deg,#7b00ff,#cc44ff);border:2px solid #cc44ff;border-radius:12px;color:#fff;font-weight:900;font-size:0.95rem;letter-spacing:2px;cursor:pointer;box-shadow:0 0 18px #cc44ff55;">🎟️ PASS METIK</button>
@@ -385,14 +410,16 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
   </div>
 </div>
 <!-- FIGHTERS -->
-<div id="fightersScreen" class="screen" style="padding-top:50px;">
-  <div style="display:flex;width:95%;height:90%;gap:15px;">
-    <div class="fighters-left">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+<div id="fightersScreen" class="screen" style="padding-top:50px;overflow:hidden;">
+  <div style="display:flex;width:95%;height:90%;gap:15px;overflow:hidden;">
+    <div class="fighters-left" style="display:flex;flex-direction:column;overflow:hidden;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-shrink:0;">
         <div style="font-size:1.2rem;color:#ffd700;font-weight:900;">🧍 БОЙЦЫ</div>
         <button class="back-btn" onclick="clickSound();showScreen('menuScreen')">← НАЗАД</button>
       </div>
-      <div class="fighters-grid" id="fightersGrid"></div>
+      <!-- Mobile page indicator (hidden, scroll used instead) -->
+      <div id="fightersPageNav" style="display:none;"></div>
+      <div class="fighters-grid" id="fightersGrid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
     </div>
     <div class="fighters-right">
       <div class="filter-block">
@@ -992,20 +1019,53 @@ function renderMenuFighter(){
   _menuFighterRaf=requestAnimationFrame(renderMenuFighter);
 }
 
+let _fightersCurrentPage = 0;
+const _FIGHTERS_PER_PAGE = 6; // 2 columns × 3 rows on mobile
+
 function renderFighters(){
   const grid=document.getElementById('fightersGrid');grid.innerHTML='';
-  FIGHTERS.filter(f=>{
+  const filtered = FIGHTERS.filter(f=>{
     if(activeFilters.class&&f.cls!==activeFilters.class)return false;
     if(activeFilters.rarity&&f.rarity!==activeFilters.rarity)return false;
     return true;
-  }).forEach(f=>{
-    const locked=!unlockedFighters.includes(f.id);
-    const card=document.createElement('div');card.className='fighter-card '+f.rarityClass;
-    card.innerHTML='<div style="font-size:3rem;margin-bottom:8px;">'+f.emoji+'</div><div style="font-weight:900;font-size:1rem;margin-bottom:5px;">'+f.name+'</div><div style="font-size:0.7rem;color:'+f.rarityColor+'">Редкость: '+f.rarity+'</div>';
-    if(locked){const lk=document.createElement('div');lk.className='fc-locked';lk.innerHTML='<div style="font-size:2rem">🔒</div><div class="fc-locked-text">Выбить из сундуков</div>';card.appendChild(lk);}
-    else card.onclick=()=>{clickSound();openFighterDetail(f.id);};
-    grid.appendChild(card);
   });
+
+  // Mobile pagination
+  const nav = document.getElementById('fightersPageNav');
+  const isMob = window.innerWidth <= 768;
+  if(isMob && nav){
+    nav.style.display = 'flex';
+    const totalPages = Math.ceil(filtered.length / _FIGHTERS_PER_PAGE);
+    _fightersCurrentPage = Math.min(_fightersCurrentPage, Math.max(0, totalPages-1));
+    const start = _fightersCurrentPage * _FIGHTERS_PER_PAGE;
+    const pageItems = filtered.slice(start, start + _FIGHTERS_PER_PAGE);
+    document.getElementById('fightersPageLabel').textContent = (_fightersCurrentPage+1)+' / '+Math.max(1,totalPages);
+    pageItems.forEach(f => _renderFighterCard(grid, f));
+  } else {
+    if(nav) nav.style.display = 'none';
+    filtered.forEach(f => _renderFighterCard(grid, f));
+  }
+}
+
+function fightersPage(dir){
+  const filtered = FIGHTERS.filter(f=>{
+    if(activeFilters.class&&f.cls!==activeFilters.class)return false;
+    if(activeFilters.rarity&&f.rarity!==activeFilters.rarity)return false;
+    return true;
+  });
+  const totalPages = Math.ceil(filtered.length / _FIGHTERS_PER_PAGE);
+  _fightersCurrentPage = Math.max(0, Math.min(totalPages-1, _fightersCurrentPage + dir));
+  renderFighters();
+}
+
+function _renderFighterCard(grid, f){
+  const locked=!unlockedFighters.includes(f.id);
+  const card=document.createElement('div');card.className='fighter-card '+f.rarityClass;
+  card.style.cssText+='touch-action:manipulation;-webkit-tap-highlight-color:transparent;';
+  card.innerHTML='<div style="font-size:3rem;margin-bottom:8px;">'+f.emoji+'</div><div style="font-weight:900;font-size:1rem;margin-bottom:5px;">'+f.name+'</div><div style="font-size:0.7rem;color:'+f.rarityColor+'">Редкость: '+f.rarity+'</div>';
+  if(locked){const lk=document.createElement('div');lk.className='fc-locked';lk.innerHTML='<div style="font-size:2rem">🔒</div><div class="fc-locked-text">Выбить из сундуков</div>';card.appendChild(lk);}
+  else card.onclick=()=>{clickSound();openFighterDetail(f.id);};
+  grid.appendChild(card);
 }
 function setGfx(q){
   graphicsQuality=q;
@@ -1392,17 +1452,14 @@ function startRound(){
   // ═══ MAP LAYOUT — interior black barrier walls ═══
   // All walls strictly inside arena (-HALF+30 to HALF-30), no overlap with borders
   const walls=[
-    // Cross walls in center
-    {x:-180,y:-13,w:140,h:26},{x:40,y:-13,w:140,h:26},
-    {x:-13,y:-180,w:26,h:140},{x:-13,y:40,w:26,h:140},
-    // Corner L-bunkers (all safely inside arena)
-    {x:-320,y:-320,w:70,h:22},{x:-320,y:-320,w:22,h:70},
-    {x:250,y:-320,w:70,h:22},{x:298,y:-320,w:22,h:70},
-    {x:-320,y:298,w:70,h:22},{x:-320,y:250,w:22,h:70},
-    {x:250,y:298,w:70,h:22},{x:298,y:250,w:22,h:70},
-    // Side channel walls
-    {x:-260,y:-60,w:22,h:120},{x:238,y:-60,w:22,h:120},
-    {x:-60,y:-260,w:120,h:22},{x:-60,y:238,w:120,h:22},
+    // Cross walls in center — shifted away from exact center to avoid spawn blocking
+    {x:-200,y:-10,w:130,h:20},{x:70,y:-10,w:130,h:20},
+    {x:-10,y:-200,w:20,h:130},{x:-10,y:70,w:20,h:130},
+    // Corner L-bunkers (all safely inside arena, away from walls)
+    {x:-310,y:-310,w:65,h:20},{x:-310,y:-310,w:20,h:65},
+    {x:245,y:-310,w:65,h:20},{x:290,y:-310,w:20,h:65},
+    {x:-310,y:290,w:65,h:20},{x:-310,y:245,w:20,h:65},
+    {x:245,y:290,w:65,h:20},{x:290,y:245,w:20,h:65},
   ];
 
   // Safe spawn: check not inside any wall
@@ -2428,13 +2485,17 @@ function stopLobbyMusic(){
 function prevTrack(){
   stopLobbyMusic();
   currentTrack=(currentTrack-1+TRACKS.length)%TRACKS.length;
-  document.getElementById('trackName').textContent=TRACKS[currentTrack].name;
+  const name=TRACKS[currentTrack].name;
+  const tn=document.getElementById('trackName');if(tn)tn.textContent=name;
+  const tnm=document.getElementById('trackNameMobile');if(tnm)tnm.textContent=name;
   setTimeout(startLobbyMusic,100);
 }
 function nextTrack(){
   stopLobbyMusic();
   currentTrack=(currentTrack+1)%TRACKS.length;
-  document.getElementById('trackName').textContent=TRACKS[currentTrack].name;
+  const name=TRACKS[currentTrack].name;
+  const tn=document.getElementById('trackName');if(tn)tn.textContent=name;
+  const tnm=document.getElementById('trackNameMobile');if(tnm)tnm.textContent=name;
   setTimeout(startLobbyMusic,100);
 }
 
@@ -2772,7 +2833,7 @@ function run3DGame(){
       if(b.life<=0||wallAt(b.x,b.y))return false;
       if(Math.hypot(b.x-player.x,b.y-player.y)<0.6){
         player.health=Math.max(0,player.health-80);
-        if(player.health<=0){game3dRunning=false;if(game3dAnim)cancelAnimationFrame(game3dAnim);cleanup3d();setTimeout(()=>showScreen('menuScreen'),300);}
+        if(player.health<=0){game3dRunning=false;if(game3dAnim)cancelAnimationFrame(game3dAnim);cleanup3d();show3DResult(false);}
         return false;
       }
       return true;
@@ -2989,13 +3050,10 @@ function run3DGame(){
     ctx.fillStyle='#ff8844';ctx.font='bold 14px Arial Black';ctx.textAlign='center';const killed3d = 10 - alive3d;
     ctx.fillText('💀 '+killed3d+' / 10',W/2,H-24);
     if(alive3d===0){
-      ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,H);
-      ctx.fillStyle='#ffd700';ctx.font='bold 48px Arial Black';ctx.textAlign='center';
-      ctx.fillText('🏆 ПОБЕДА!',W/2,H/2-20);
-      ctx.fillStyle='#aaa';ctx.font='bold 22px Arial';
-      ctx.fillText('Ты уничтожил всех 10 ботов!',W/2,H/2+30);
-      ctx.fillStyle='#00ff88';ctx.font='bold 18px Arial';
-      ctx.fillText('Нажми ESC или кнопку ВЫХОД',W/2,H/2+70);
+      game3dRunning=false;
+      if(game3dAnim)cancelAnimationFrame(game3dAnim);
+      cleanup3d();
+      show3DResult(true);
     }
   }
 
@@ -3009,6 +3067,51 @@ function run3DGame(){
   game3dAnim=requestAnimationFrame(t=>{lastTime=t;requestAnimationFrame(loop3d);});
 }
 
+// ─── 3D RESULT SCREEN ────────────────────────────────────────────────────────
+function show3DResult(won){
+  let ov = document.getElementById('result3DOverlay');
+  if(!ov){
+    ov = document.createElement('div');
+    ov.id = 'result3DOverlay';
+    ov.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;';
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML = `
+    <div style="font-size:5rem;margin-bottom:16px;animation:pgPulse 0.8s ease-in-out infinite;">${won?'🏆':'💀'}</div>
+    <div style="font-size:2.8rem;font-weight:900;letter-spacing:4px;color:${won?'#ffd700':'#ff4444'};text-shadow:0 0 30px ${won?'#ffd700':'#ff4444'};margin-bottom:10px;">${won?'ВЫ ПОБЕДИЛИ!':'ВЫ ПРОИГРАЛИ!'}</div>
+    <div style="color:#aaa;font-size:1rem;letter-spacing:2px;margin-bottom:40px;">${won?'Все 10 ботов уничтожены!':'Вы были убиты...'}</div>
+    <button id="btn3DMenu" onclick="handle3DMenuClick()" style="padding:16px 50px;font-size:1.2rem;font-weight:900;border:none;border-radius:14px;cursor:pointer;letter-spacing:3px;background:linear-gradient(135deg,#ffd700,#ff9500);color:#000;box-shadow:0 0 30px rgba(255,140,0,0.5);transition:all 0.2s;text-transform:uppercase;">🏠 МЕНЮ</button>
+    <div style="margin-top:30px;width:320px;height:10px;background:rgba(255,255,255,0.1);border-radius:5px;overflow:hidden;display:none;" id="r3dBar">
+      <div id="r3dBarFill" style="height:100%;width:0%;background:linear-gradient(90deg,${won?'#ffd700,#ff9500':'#ff4444,#cc0000'});border-radius:5px;transition:width 0.05s linear;"></div>
+    </div>
+    <style>@keyframes pgPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}</style>
+  `;
+  ov.style.display = 'flex';
+  if(won){addStraps(1);addTrophies(2);}
+}
+function handle3DMenuClick(){
+  clickSound();
+  const ov = document.getElementById('result3DOverlay');
+  const btn = document.getElementById('btn3DMenu');
+  if(btn) btn.disabled = true;
+  const bar = document.getElementById('r3dBar');
+  const fill = document.getElementById('r3dBarFill');
+  if(bar) bar.style.display = 'block';
+  let pct = 0;
+  const iv = setInterval(()=>{
+    pct += 5;
+    if(fill) fill.style.width = Math.min(pct,100)+'%';
+    if(pct >= 100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        if(ov) ov.style.display = 'none';
+        hideMobileControls3D();
+        showScreen('menuScreen');
+      }, 100);
+    }
+  }, 100);
+}
+
 // ─── MUSIC CONTROL in settings/menu ──────────────────────────────────────────
 // add track switcher to menuScreen after load
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3018,6 +3121,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   mc.style.cssText='position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;z-index:10;background:rgba(0,0,0,0.5);border:1px solid #00ff8844;border-radius:20px;padding:7px 18px;';
   mc.innerHTML=`<button onclick="clickSound();prevTrack()" style="background:none;border:1px solid #00ff8844;border-radius:8px;color:#00ff88;cursor:pointer;padding:2px 8px;font-size:0.8rem;">◀</button><span style="color:#aaa;font-size:0.75rem;">🎵</span><span id="trackName" style="color:#00ff88;font-size:0.75rem;font-weight:900;min-width:80px;text-align:center;">${TRACKS[0].name}</span><button onclick="clickSound();nextTrack()" style="background:none;border:1px solid #00ff8844;border-radius:8px;color:#00ff88;cursor:pointer;padding:2px 8px;font-size:0.8rem;">▶</button>`;
   ms.appendChild(mc);
+  // Init mobile track name
+  const tnm=document.getElementById('trackNameMobile');
+  if(tnm)tnm.textContent=TRACKS[0].name;
 });
 
 </script>
