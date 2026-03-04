@@ -203,18 +203,17 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
 ═══════════════════════════════════════════════ */
 #mobileControls{display:none;position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;}
 #mobileControls.active{display:block;}
-/* Left joystick zone */
+/* Left movement joystick */
 #joystickZone{position:absolute;bottom:80px;left:20px;width:150px;height:150px;pointer-events:all;}
 #joystickBase{position:absolute;top:0;left:0;width:150px;height:150px;background:rgba(255,255,255,0.08);border:3px solid rgba(255,255,255,0.25);border-radius:50%;}
 #joystickThumb{position:absolute;width:60px;height:60px;background:rgba(255,255,255,0.35);border:3px solid rgba(255,255,255,0.6);border-radius:50%;top:45px;left:45px;transition:box-shadow 0.1s;box-shadow:0 0 12px rgba(255,255,255,0.3);}
-/* Right shoot/aim button */
-#shootBtn{position:absolute;bottom:80px;right:20px;width:90px;height:90px;background:rgba(255,80,0,0.5);border:3px solid rgba(255,120,0,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;pointer-events:all;user-select:none;-webkit-user-select:none;box-shadow:0 0 20px rgba(255,100,0,0.4);}
-#shootBtn:active{background:rgba(255,80,0,0.8);transform:scale(0.93);}
+/* Right aim joystick (for aiming direction) */
+#aimArea{position:absolute;bottom:80px;right:20px;width:150px;height:150px;pointer-events:all;touch-action:none;}
+#aimBase{position:absolute;top:0;left:0;width:150px;height:150px;background:rgba(255,120,0,0.08);border:3px solid rgba(255,140,0,0.4);border-radius:50%;}
+#aimThumb{position:absolute;width:60px;height:60px;background:rgba(255,160,0,0.45);border:3px solid rgba(255,210,120,0.9);border-radius:50%;top:45px;left:45px;box-shadow:0 0 18px rgba(255,180,80,0.7);}
 /* Ult button */
 #ultBtn{position:absolute;bottom:185px;right:25px;width:65px;height:65px;background:rgba(255,215,0,0.3);border:3px solid rgba(255,215,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;pointer-events:all;user-select:none;-webkit-user-select:none;}
 #ultBtn:active{background:rgba(255,215,0,0.6);transform:scale(0.93);}
-/* Aim area (right half of screen, for camera rotation) */
-#aimArea{position:absolute;top:0;right:0;width:55%;height:70%;pointer-events:all;touch-action:none;}
 
 /* Mobile 3D controls */
 #mobile3DControls{display:none;position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;}
@@ -296,8 +295,10 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
     <div id="joystickBase"></div>
     <div id="joystickThumb"></div>
   </div>
-  <div id="aimArea"></div>
-  <div id="shootBtn">🔥</div>
+  <div id="aimArea">
+    <div id="aimBase"></div>
+    <div id="aimThumb"></div>
+  </div>
   <div id="ultBtn">⚡</div>
 </div>
 
@@ -656,8 +657,6 @@ function applyDeviceMode(){
 // ── Mobile 2D Joystick ──
 const mobileJoy = {active:false, id:null, startX:0, startY:0, dx:0, dy:0};
 const mobileAim = {active:false, id:null, startX:0, startY:0, dx:0, dy:0};
-let mobileShootHeld = false;
-
 function initMobileControls2D(){
   if(!isMobileMode) return;
   const mc = document.getElementById('mobileControls');
@@ -667,8 +666,10 @@ function initMobileControls2D(){
 
   const jZone = document.getElementById('joystickZone');
   const thumb = document.getElementById('joystickThumb');
-  const aimArea = document.getElementById('aimArea');
+  const aimZone = document.getElementById('aimArea');
+  const aimThumb = document.getElementById('aimThumb');
 
+  // Movement joystick (левый)
   function joyStart(e){
     e.preventDefault();
     const t = e.changedTouches[0];
@@ -701,32 +702,40 @@ function initMobileControls2D(){
   jZone.addEventListener('touchend',joyEnd,{passive:false});
   jZone.addEventListener('touchcancel',joyEnd,{passive:false});
 
-  // Aim area for camera/angle control
+  // Aim joystick (правый) — управляет направлением прицела
   function aimStart(e){
     e.preventDefault();
     const t=e.changedTouches[0];
     mobileAim.active=true; mobileAim.id=t.identifier;
     mobileAim.startX=t.clientX; mobileAim.startY=t.clientY;
+    mobileAim.dx=0; mobileAim.dy=0;
   }
   function aimMove(e){
     e.preventDefault();
     for(const t of e.changedTouches){
       if(t.identifier===mobileAim.id){
-        mobileAim.dx=t.clientX-mobileAim.startX;
-        mobileAim.dy=t.clientY-mobileAim.startY;
-        mobileAim.startX=t.clientX; mobileAim.startY=t.clientY;
+        const dx=t.clientX-mobileAim.startX, dy=t.clientY-mobileAim.startY;
+        const len=Math.sqrt(dx*dx+dy*dy), maxR=50;
+        const cx=Math.min(len,maxR)*dx/(len||1), cy=Math.min(len,maxR)*dy/(len||1);
+        // Нормализованный вектор направления прицела
+        mobileAim.dx=cx/maxR; mobileAim.dy=cy/maxR;
+        aimThumb.style.left=(45+cx)+'px'; aimThumb.style.top=(45+cy)+'px';
       }
     }
   }
-  function aimEnd(e){for(const t of e.changedTouches){if(t.identifier===mobileAim.id){mobileAim.active=false;mobileAim.dx=0;mobileAim.dy=0;}}}
-  aimArea.addEventListener('touchstart',aimStart,{passive:false});
-  aimArea.addEventListener('touchmove',aimMove,{passive:false});
-  aimArea.addEventListener('touchend',aimEnd,{passive:false});
+  function aimEnd(e){
+    for(const t of e.changedTouches){
+      if(t.identifier===mobileAim.id){
+        mobileAim.active=false; mobileAim.dx=0; mobileAim.dy=0;
+        aimThumb.style.left='45px'; aimThumb.style.top='45px';
+      }
+    }
+  }
+  aimZone.addEventListener('touchstart',aimStart,{passive:false});
+  aimZone.addEventListener('touchmove',aimMove,{passive:false});
+  aimZone.addEventListener('touchend',aimEnd,{passive:false});
+  aimZone.addEventListener('touchcancel',aimEnd,{passive:false});
 
-  // Shoot button
-  const sBtn=document.getElementById('shootBtn');
-  sBtn.addEventListener('touchstart',(e)=>{e.preventDefault();mobileShootHeld=true;},{passive:false});
-  sBtn.addEventListener('touchend',(e)=>{e.preventDefault();mobileShootHeld=false;},{passive:false});
   // Ult button
   document.getElementById('ultBtn').addEventListener('touchstart',(e)=>{e.preventDefault();if(window._mobileUltFn)window._mobileUltFn();},{passive:false});
 }
@@ -1645,14 +1654,13 @@ function startRound(){
     // Mobile joystick input
     if(isMobileMode && mobileJoy.active){dx=mobileJoy.dx;dy=mobileJoy.dy;}
     if(dx||dy){const len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;const sp=player.speed*(player.speedBoost?2.2:1);let nx=clampP(player.x+dx*sp*dt,HALF),ny=clampP(player.y+dy*sp*dt,HALF);if(!wallBlock(nx,player.y,player.w))player.x=nx;if(!wallBlock(player.x,ny,player.h))player.y=ny;}
-    // Mobile aim: accumulate angle from swipe
+    // Mobile aim: right joystick задаёт направление прицела
     if(isMobileMode && mobileAim.active && (mobileAim.dx||mobileAim.dy)){
-      player.angle += mobileAim.dx * 0.008;
-      mobileAim.dx=0; mobileAim.dy=0;
+      player.angle = Math.atan2(mobileAim.dy, mobileAim.dx);
     }
     const wx=(mouse.x-canvas.width/2)/cam.zoom+cam.x,wy=(mouse.y-canvas.height/2)/cam.zoom+cam.y;
     if(!isMobileMode) player.angle=Math.atan2(wy-player.y,wx-player.x);
-    player.aiming = isMobileMode ? mobileShootHeld : mouse.down;
+    player.aiming = isMobileMode ? mobileAim.active : mouse.down;
     if(player.reloadLeft>0)player.reloadLeft-=dt;
     document.getElementById('reloadDisplay').textContent=player.reloadLeft>0?player.reloadLeft.toFixed(1)+'s':'Готово';
     const curDmg=player.dmg*(player.dmgBoost?1.5:1);
