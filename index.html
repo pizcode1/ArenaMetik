@@ -179,9 +179,139 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
 .result-lose{color:#ff4444;text-shadow:0 0 30px #ff4444;}
 .result-rewards{display:flex;gap:20px;font-size:1.1rem;}
 .result-reward-item{background:rgba(0,0,0,0.5);border-radius:10px;padding:10px 20px;display:flex;align-items:center;gap:8px;}
+
+/* ═══════════════════════════════════════════════
+   DEVICE DETECTION MODAL
+═══════════════════════════════════════════════ */
+#deviceModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(8px);}
+#deviceModal.active{display:flex;}
+.device-box{background:linear-gradient(135deg,#0d2b1a,#1a0030);border:2px solid #ffd700;border-radius:20px;padding:35px 40px;text-align:center;max-width:480px;width:90%;animation:devicePop 0.5s cubic-bezier(0.175,0.885,0.32,1.275);}
+@keyframes devicePop{0%{transform:scale(0.5) translateY(40px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+.device-title{font-size:1.4rem;color:#ffd700;font-weight:900;letter-spacing:2px;margin-bottom:8px;}
+.device-detected{font-size:0.85rem;color:#88ff88;margin-bottom:25px;letter-spacing:1px;}
+.device-detected span{color:#00e5ff;font-weight:900;}
+.device-btns{display:flex;gap:15px;justify-content:center;flex-wrap:wrap;}
+.device-btn{padding:16px 28px;border:none;border-radius:14px;cursor:pointer;font-weight:900;font-size:1rem;letter-spacing:2px;transition:all 0.2s;min-width:140px;}
+.device-btn-pc{background:linear-gradient(135deg,#4488ff,#0055cc);color:#fff;}
+.device-btn-pc:hover,.device-btn-pc:active{transform:scale(1.07);box-shadow:0 0 20px rgba(68,136,255,0.6);}
+.device-btn-mobile{background:linear-gradient(135deg,#00cc44,#008833);color:#fff;}
+.device-btn-mobile:hover,.device-btn-mobile:active{transform:scale(1.07);box-shadow:0 0 20px rgba(0,204,68,0.6);}
+.device-icon{font-size:3rem;margin-bottom:15px;}
+
+/* ═══════════════════════════════════════════════
+   MOBILE JOYSTICK CONTROLS
+═══════════════════════════════════════════════ */
+#mobileControls{display:none;position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;}
+#mobileControls.active{display:block;}
+/* Left joystick zone */
+#joystickZone{position:absolute;bottom:80px;left:20px;width:150px;height:150px;pointer-events:all;}
+#joystickBase{position:absolute;top:0;left:0;width:150px;height:150px;background:rgba(255,255,255,0.08);border:3px solid rgba(255,255,255,0.25);border-radius:50%;}
+#joystickThumb{position:absolute;width:60px;height:60px;background:rgba(255,255,255,0.35);border:3px solid rgba(255,255,255,0.6);border-radius:50%;top:45px;left:45px;transition:box-shadow 0.1s;box-shadow:0 0 12px rgba(255,255,255,0.3);}
+/* Right shoot/aim button */
+#shootBtn{position:absolute;bottom:80px;right:20px;width:90px;height:90px;background:rgba(255,80,0,0.5);border:3px solid rgba(255,120,0,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;pointer-events:all;user-select:none;-webkit-user-select:none;box-shadow:0 0 20px rgba(255,100,0,0.4);}
+#shootBtn:active{background:rgba(255,80,0,0.8);transform:scale(0.93);}
+/* Ult button */
+#ultBtn{position:absolute;bottom:185px;right:25px;width:65px;height:65px;background:rgba(255,215,0,0.3);border:3px solid rgba(255,215,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;pointer-events:all;user-select:none;-webkit-user-select:none;}
+#ultBtn:active{background:rgba(255,215,0,0.6);transform:scale(0.93);}
+/* Aim area (right half of screen, for camera rotation) */
+#aimArea{position:absolute;top:0;right:0;width:55%;height:70%;pointer-events:all;touch-action:none;}
+
+/* Mobile 3D controls */
+#mobile3DControls{display:none;position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;}
+#mobile3DControls.active{display:block;}
+#joy3DZone{position:absolute;bottom:90px;left:20px;width:140px;height:140px;pointer-events:all;touch-action:none;}
+#joy3DBase{position:absolute;top:0;left:0;width:140px;height:140px;background:rgba(0,255,136,0.08);border:3px solid rgba(0,255,136,0.3);border-radius:50%;}
+#joy3DThumb{position:absolute;width:55px;height:55px;background:rgba(0,255,136,0.3);border:3px solid rgba(0,255,136,0.7);border-radius:50%;top:42px;left:42px;}
+#shoot3DBtn{position:absolute;bottom:90px;right:20px;width:85px;height:85px;background:rgba(255,80,0,0.5);border:3px solid rgba(255,120,0,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;pointer-events:all;user-select:none;-webkit-user-select:none;}
+#shoot3DBtn:active{background:rgba(255,80,0,0.8);transform:scale(0.93);}
+#jump3DBtn{position:absolute;bottom:190px;right:25px;width:60px;height:60px;background:rgba(100,200,255,0.3);border:3px solid rgba(100,200,255,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;pointer-events:all;user-select:none;-webkit-user-select:none;}
+#jump3DBtn:active{background:rgba(100,200,255,0.7);transform:scale(0.93);}
+#lookArea3D{position:absolute;top:0;right:0;width:55%;height:75%;pointer-events:all;touch-action:none;}
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE LAYOUT
+═══════════════════════════════════════════════ */
+@media (max-width:768px){
+  .logo{font-size:2.2rem;}
+  .load-bar-wrap{width:80vw;}
+  .welcome-overlay{padding:30px 20px;margin:20px;}
+  .welcome-title{font-size:1.4rem;}
+  .left-panel{width:160px;padding:16px 10px;}
+  .menu-btn{font-size:0.85rem;padding:12px 10px;}
+  .btn-fight{font-size:1.2rem;padding:14px 40px;}
+  .straps-hud,.trophy-hud{font-size:0.85rem;padding:5px 10px;}
+  .fighters-left{flex:1;}
+  .fighters-right{display:none;}
+  .fighters-grid{grid-template-columns:repeat(2,1fr);}
+  .detail-layout{flex-direction:column;width:95%;}
+  .big-fighter{font-size:5rem;}
+  .mode-card{width:130px;padding:15px 10px;}
+  .mode-card div:first-child{font-size:2rem;}
+  .mode-card div:nth-child(2){font-size:0.9rem;}
+  .mode-card div:nth-child(3){font-size:0.7rem;}
+  #modesScreen > div:nth-child(3){flex-wrap:wrap;gap:12px;}
+  .shop-card{min-width:140px;}
+  .settings-box{width:90vw;padding:20px;}
+  .trophy-road{padding:15px 20px;}
+  .trophy-node-box{width:70px;height:70px;}
+  .hp-bar-outer{width:130px;}
+  .ult-bar-outer{width:100px;}
+  .hud-top{padding:6px 8px;}
+  .controls-hint{display:none;}
+  #roundHud{font-size:0.7rem !important;padding:4px 12px !important;}
+  .result-title{font-size:2.5rem;}
+  .modal-box{padding:25px 20px;}
+  .name-input{width:200px;}
+  #fightersScreen{flex-direction:column;padding:10px;}
+  .fighters-left{gap:8px;}
+  .filter-block{display:none;}
+}
+@media (max-width:480px){
+  .logo{font-size:1.8rem;}
+  .left-panel{width:130px;}
+  .menu-btn{font-size:0.75rem;padding:10px 8px;letter-spacing:0;}
+  .top-right-btns{gap:6px;}
+  .straps-hud,.trophy-hud{font-size:0.75rem;padding:4px 8px;}
+  .mode-card{width:110px;padding:12px 8px;}
+}
 </style>
 </head>
 <body>
+<!-- DEVICE DETECTION MODAL -->
+<div id="deviceModal">
+  <div class="device-box">
+    <div class="device-icon" id="deviceIcon">📱</div>
+    <div class="device-title">С КАКОГО УСТРОЙСТВА ВЫ ИГРАЕТЕ?</div>
+    <div class="device-detected">Определено: <span id="detectedDeviceText">Загрузка...</span></div>
+    <div class="device-btns">
+      <button class="device-btn device-btn-pc" onclick="chooseDevice('pc')">🖥️ ПК</button>
+      <button class="device-btn device-btn-mobile" onclick="chooseDevice('mobile')">📱 ТЕЛЕФОН</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE 2D CONTROLS -->
+<div id="mobileControls">
+  <div id="joystickZone">
+    <div id="joystickBase"></div>
+    <div id="joystickThumb"></div>
+  </div>
+  <div id="aimArea"></div>
+  <div id="shootBtn">🔥</div>
+  <div id="ultBtn">⚡</div>
+</div>
+
+<!-- MOBILE 3D CONTROLS -->
+<div id="mobile3DControls">
+  <div id="joy3DZone">
+    <div id="joy3DBase"></div>
+    <div id="joy3DThumb"></div>
+  </div>
+  <div id="lookArea3D"></div>
+  <div id="shoot3DBtn">🔥</div>
+  <div id="jump3DBtn">🦘</div>
+</div>
+
 <!-- LOADING -->
 <div id="loadingScreen" class="screen active">
   <div class="jungle-bg" id="jungleBg"></div>
@@ -477,6 +607,171 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
 const Sv=(k,v)=>{try{localStorage.setItem('cloco_'+k,JSON.stringify(v));}catch(e){}};
 const Ld=(k,d)=>{try{const v=localStorage.getItem('cloco_'+k);return v!=null?JSON.parse(v):d;}catch(e){return d;}};
 
+// ═══════════════════════════════════════════════
+// DEVICE DETECTION & MOBILE MODE
+// ═══════════════════════════════════════════════
+let isMobileMode = Ld('deviceMode','auto') === 'mobile';
+let deviceSelected = Ld('deviceMode','auto') !== 'auto';
+
+function detectDevice(){
+  const ua = navigator.userAgent||'';
+  const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 1;
+  const isSmallScreen = window.innerWidth <= 900;
+  const isMobileUA = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  if(isMobileUA || (isTouchDevice && isSmallScreen)) return 'mobile';
+  return 'pc';
+}
+
+function showDeviceModal(){
+  const detected = detectDevice();
+  document.getElementById('detectedDeviceText').textContent = detected === 'mobile' ? '📱 Мобильное устройство' : '🖥️ Компьютер / ПК';
+  document.getElementById('deviceIcon').textContent = detected === 'mobile' ? '📱' : '🖥️';
+  document.getElementById('deviceModal').classList.add('active');
+}
+
+function chooseDevice(type){
+  clickSound();
+  isMobileMode = (type === 'mobile');
+  deviceSelected = true;
+  Sv('deviceMode', type);
+  document.getElementById('deviceModal').classList.remove('active');
+  applyDeviceMode();
+  // After choosing — go to welcome or menu
+  if(playerName){ showScreen('menuScreen'); } else { showScreen('welcomeScreen'); }
+}
+
+function applyDeviceMode(){
+  if(isMobileMode){
+    document.body.classList.add('mobile-mode');
+    // Update controls hint
+    const hint = document.querySelector('.controls-hint');
+    if(hint) hint.style.display='none';
+    const ultHint = document.querySelector('[style*="[E] — активировать"]');
+    if(ultHint) ultHint.style.display='none';
+  } else {
+    document.body.classList.remove('mobile-mode');
+  }
+}
+
+// ── Mobile 2D Joystick ──
+const mobileJoy = {active:false, id:null, startX:0, startY:0, dx:0, dy:0};
+const mobileAim = {active:false, id:null, startX:0, startY:0, dx:0, dy:0};
+let mobileShootHeld = false;
+
+function initMobileControls2D(){
+  if(!isMobileMode) return;
+  const mc = document.getElementById('mobileControls');
+  const gameScreen = document.getElementById('gameScreen');
+  gameScreen.appendChild(mc);
+  mc.classList.add('active');
+
+  const jZone = document.getElementById('joystickZone');
+  const thumb = document.getElementById('joystickThumb');
+  const aimArea = document.getElementById('aimArea');
+
+  function joyStart(e){
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    mobileJoy.active=true; mobileJoy.id=t.identifier;
+    mobileJoy.startX=t.clientX; mobileJoy.startY=t.clientY;
+    mobileJoy.dx=0; mobileJoy.dy=0;
+  }
+  function joyMove(e){
+    e.preventDefault();
+    for(const t of e.changedTouches){
+      if(t.identifier===mobileJoy.id){
+        const dx=t.clientX-mobileJoy.startX, dy=t.clientY-mobileJoy.startY;
+        const len=Math.sqrt(dx*dx+dy*dy), maxR=50;
+        const cx=Math.min(len,maxR)*dx/(len||1), cy=Math.min(len,maxR)*dy/(len||1);
+        mobileJoy.dx=cx/maxR; mobileJoy.dy=cy/maxR;
+        thumb.style.left=(45+cx)+'px'; thumb.style.top=(45+cy)+'px';
+      }
+    }
+  }
+  function joyEnd(e){
+    for(const t of e.changedTouches){
+      if(t.identifier===mobileJoy.id){
+        mobileJoy.active=false; mobileJoy.dx=0; mobileJoy.dy=0;
+        thumb.style.left='45px'; thumb.style.top='45px';
+      }
+    }
+  }
+  jZone.addEventListener('touchstart',joyStart,{passive:false});
+  jZone.addEventListener('touchmove',joyMove,{passive:false});
+  jZone.addEventListener('touchend',joyEnd,{passive:false});
+  jZone.addEventListener('touchcancel',joyEnd,{passive:false});
+
+  // Aim area for camera/angle control
+  function aimStart(e){
+    e.preventDefault();
+    const t=e.changedTouches[0];
+    mobileAim.active=true; mobileAim.id=t.identifier;
+    mobileAim.startX=t.clientX; mobileAim.startY=t.clientY;
+  }
+  function aimMove(e){
+    e.preventDefault();
+    for(const t of e.changedTouches){
+      if(t.identifier===mobileAim.id){
+        mobileAim.dx=t.clientX-mobileAim.startX;
+        mobileAim.dy=t.clientY-mobileAim.startY;
+        mobileAim.startX=t.clientX; mobileAim.startY=t.clientY;
+      }
+    }
+  }
+  function aimEnd(e){for(const t of e.changedTouches){if(t.identifier===mobileAim.id){mobileAim.active=false;mobileAim.dx=0;mobileAim.dy=0;}}}
+  aimArea.addEventListener('touchstart',aimStart,{passive:false});
+  aimArea.addEventListener('touchmove',aimMove,{passive:false});
+  aimArea.addEventListener('touchend',aimEnd,{passive:false});
+
+  // Shoot button
+  const sBtn=document.getElementById('shootBtn');
+  sBtn.addEventListener('touchstart',(e)=>{e.preventDefault();mobileShootHeld=true;},{passive:false});
+  sBtn.addEventListener('touchend',(e)=>{e.preventDefault();mobileShootHeld=false;},{passive:false});
+  // Ult button
+  document.getElementById('ultBtn').addEventListener('touchstart',(e)=>{e.preventDefault();if(window._mobileUltFn)window._mobileUltFn();},{passive:false});
+}
+
+function hideMobileControls2D(){
+  document.getElementById('mobileControls').classList.remove('active');
+}
+
+// ── Mobile 3D Joystick ──
+const mobileJoy3D = {active:false, id:null, startX:0, startY:0, dx:0, dy:0};
+const mobileLook3D = {dx:0, dy:0, id:null, startX:0, startY:0};
+
+function initMobileControls3D(){
+  if(!isMobileMode) return;
+  const mc3 = document.getElementById('mobile3DControls');
+  const screen3d = document.getElementById('screen3d');
+  screen3d.appendChild(mc3);
+  mc3.classList.add('active');
+
+  const jZone3 = document.getElementById('joy3DZone');
+  const thumb3 = document.getElementById('joy3DThumb');
+  const lookArea = document.getElementById('lookArea3D');
+
+  function jS(e){e.preventDefault();const t=e.changedTouches[0];mobileJoy3D.active=true;mobileJoy3D.id=t.identifier;mobileJoy3D.startX=t.clientX;mobileJoy3D.startY=t.clientY;}
+  function jM(e){e.preventDefault();for(const t of e.changedTouches){if(t.identifier===mobileJoy3D.id){const dx=t.clientX-mobileJoy3D.startX,dy=t.clientY-mobileJoy3D.startY;const len=Math.sqrt(dx*dx+dy*dy),maxR=48;const cx=Math.min(len,maxR)*dx/(len||1),cy=Math.min(len,maxR)*dy/(len||1);mobileJoy3D.dx=cx/maxR;mobileJoy3D.dy=cy/maxR;thumb3.style.left=(42+cx)+'px';thumb3.style.top=(42+cy)+'px';}}}
+  function jE(e){for(const t of e.changedTouches){if(t.identifier===mobileJoy3D.id){mobileJoy3D.active=false;mobileJoy3D.dx=0;mobileJoy3D.dy=0;thumb3.style.left='42px';thumb3.style.top='42px';}}}
+  jZone3.addEventListener('touchstart',jS,{passive:false});
+  jZone3.addEventListener('touchmove',jM,{passive:false});
+  jZone3.addEventListener('touchend',jE,{passive:false});
+
+  function lS(e){e.preventDefault();const t=e.changedTouches[0];mobileLook3D.id=t.identifier;mobileLook3D.startX=t.clientX;mobileLook3D.startY=t.clientY;}
+  function lM(e){e.preventDefault();for(const t of e.changedTouches){if(t.identifier===mobileLook3D.id){mobileLook3D.dx=t.clientX-mobileLook3D.startX;mobileLook3D.dy=t.clientY-mobileLook3D.startY;mobileLook3D.startX=t.clientX;mobileLook3D.startY=t.clientY;}}}
+  function lE(e){for(const t of e.changedTouches){if(t.identifier===mobileLook3D.id){mobileLook3D.dx=0;mobileLook3D.dy=0;}}}
+  lookArea.addEventListener('touchstart',lS,{passive:false});
+  lookArea.addEventListener('touchmove',lM,{passive:false});
+  lookArea.addEventListener('touchend',lE,{passive:false});
+
+  document.getElementById('shoot3DBtn').addEventListener('touchstart',(e)=>{e.preventDefault();if(window._shoot3dFn)window._shoot3dFn();},{passive:false});
+  document.getElementById('jump3DBtn').addEventListener('touchstart',(e)=>{e.preventDefault();if(window._jump3dFn)window._jump3dFn();},{passive:false});
+}
+
+function hideMobileControls3D(){
+  document.getElementById('mobile3DControls').classList.remove('active');
+}
+
 let audioCtx=null;
 let btnVol=Ld('btnVol',1.0);
 let menuVol=Ld('menuVol',1.0);
@@ -593,7 +888,18 @@ function showScreen(id){
   const msgs=['Загрузка...','Инициализация арены...','Подготовка бойцов...','Запуск!'];
   const bar=document.getElementById('loadBar'),txt=document.getElementById('loadText');
   const iv=setInterval(()=>{p+=1;bar.style.width=p+'%';txt.textContent=msgs[Math.min(mi,3)];if(p%25===0)mi++;
-    if(p>=100){clearInterval(iv);setTimeout(()=>{if(playerName){showScreen('menuScreen');}else showScreen('welcomeScreen');},400);}
+    if(p>=100){clearInterval(iv);setTimeout(()=>{
+      if(!deviceSelected){
+        // Show welcome/menu briefly, then device modal after 10 seconds
+        if(playerName){showScreen('menuScreen');}else showScreen('welcomeScreen');
+        setTimeout(()=>{
+          showDeviceModal();
+        }, 10000);
+      } else {
+        applyDeviceMode();
+        if(playerName){showScreen('menuScreen');}else showScreen('welcomeScreen');
+      }
+    },400);}
   },45);
 })();
 
@@ -1018,8 +1324,8 @@ function claimTrophyReward(idx){
   if(m.type!=='fighter')alert('🎉 Награда: '+m.reward);
 }
 
-function startGame(){showScreen('gameScreen');initGame();}
-function backToMenu(){showScreen('menuScreen');}
+function startGame(){showScreen('gameScreen');if(isMobileMode)initMobileControls2D();initGame();}
+function backToMenu(){hideMobileControls2D();hideMobileControls3D();showScreen('menuScreen');}
 
 function initGame(){
   if(gameMode==='2v2')roundState={wins:[0,0],round:1};
@@ -1180,6 +1486,8 @@ function startRound(){
 
   const keys={};
   let mouse={x:canvas.width/2,y:canvas.height/2,down:false};
+  // Mobile aim angle accumulator
+  let mobileAngleAccum = 0;
   function onKD(e){keys[e.key.toLowerCase()]=true;if(e.key.toLowerCase()==='e')useUlt();e.preventDefault();}
   function onKU(e){keys[e.key.toLowerCase()]=false;}
   function onMM(e){mouse.x=e.clientX;mouse.y=e.clientY;}
@@ -1189,10 +1497,11 @@ function startRound(){
   document.addEventListener('keydown',onKD);document.addEventListener('keyup',onKU);
   canvas.addEventListener('mousemove',onMM);canvas.addEventListener('mousedown',onMD);
   canvas.addEventListener('mouseup',onMU);canvas.addEventListener('contextmenu',onCM);
-  canvas.setAttribute('tabindex','0');canvas.focus();
-  function cleanup(){document.removeEventListener('keydown',onKD);document.removeEventListener('keyup',onKU);canvas.removeEventListener('mousemove',onMM);canvas.removeEventListener('mousedown',onMD);canvas.removeEventListener('mouseup',onMU);canvas.removeEventListener('contextmenu',onCM);}
+  canvas.setAttribute('tabindex','0');if(!isMobileMode)canvas.focus();
+  function cleanup(){document.removeEventListener('keydown',onKD);document.removeEventListener('keyup',onKU);canvas.removeEventListener('mousemove',onMM);canvas.removeEventListener('mousedown',onMD);canvas.removeEventListener('mouseup',onMU);canvas.removeEventListener('contextmenu',onCM);window._mobileUltFn=null;}
 
   function useUlt(){
+    window._mobileUltFn = useUlt; // expose for mobile button
     if(player.ult<100)return;player.ult=0;
     document.getElementById('ultBar').style.width='0%';document.getElementById('ultNum').textContent='0';
     // Find nearest enemy bot helper
@@ -1333,14 +1642,21 @@ function startRound(){
     let dx=0,dy=0;
     if(keys['w']||keys['arrowup'])dy=-1;if(keys['s']||keys['arrowdown'])dy=1;
     if(keys['a']||keys['arrowleft'])dx=-1;if(keys['d']||keys['arrowright'])dx=1;
-    if(dx||dy){const len=Math.hypot(dx,dy);dx/=len;dy/=len;const sp=player.speed*(player.speedBoost?2.2:1);let nx=clampP(player.x+dx*sp*dt,HALF),ny=clampP(player.y+dy*sp*dt,HALF);if(!wallBlock(nx,player.y,player.w))player.x=nx;if(!wallBlock(player.x,ny,player.h))player.y=ny;}
+    // Mobile joystick input
+    if(isMobileMode && mobileJoy.active){dx=mobileJoy.dx;dy=mobileJoy.dy;}
+    if(dx||dy){const len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;const sp=player.speed*(player.speedBoost?2.2:1);let nx=clampP(player.x+dx*sp*dt,HALF),ny=clampP(player.y+dy*sp*dt,HALF);if(!wallBlock(nx,player.y,player.w))player.x=nx;if(!wallBlock(player.x,ny,player.h))player.y=ny;}
+    // Mobile aim: accumulate angle from swipe
+    if(isMobileMode && mobileAim.active && (mobileAim.dx||mobileAim.dy)){
+      player.angle += mobileAim.dx * 0.008;
+      mobileAim.dx=0; mobileAim.dy=0;
+    }
     const wx=(mouse.x-canvas.width/2)/cam.zoom+cam.x,wy=(mouse.y-canvas.height/2)/cam.zoom+cam.y;
-    player.angle=Math.atan2(wy-player.y,wx-player.x);
-    player.aiming=mouse.down;
+    if(!isMobileMode) player.angle=Math.atan2(wy-player.y,wx-player.x);
+    player.aiming = isMobileMode ? mobileShootHeld : mouse.down;
     if(player.reloadLeft>0)player.reloadLeft-=dt;
     document.getElementById('reloadDisplay').textContent=player.reloadLeft>0?player.reloadLeft.toFixed(1)+'s':'Готово';
     const curDmg=player.dmg*(player.dmgBoost?1.5:1);
-    if(mouse.down&&player.reloadLeft<=0&&player.magLeft>0){spawnBullet(player.x,player.y,player.angle,'player',curDmg,player.attackType);player.magLeft--;player.reloadLeft=player.reloadTime;if(player.magLeft<=0){player.magLeft=0;player.reloadLeft=player.reloadTime*5;}}
+    if(player.aiming&&player.reloadLeft<=0&&player.magLeft>0){spawnBullet(player.x,player.y,player.angle,'player',curDmg,player.attackType);player.magLeft--;player.reloadLeft=player.reloadTime;if(player.magLeft<=0){player.magLeft=0;player.reloadLeft=player.reloadTime*5;}}
     if(player.magLeft<=0&&player.reloadLeft<=0){player.magLeft=player.magSize;}
     if(player.dmgBoost){player.dmgBoostTimer+=dt;if(player.dmgBoostTimer>3)player.dmgBoost=false;}
     if(player.speedBoost){player.speedBoostTimer+=dt;if(player.speedBoostTimer>3)player.speedBoost=false;}
@@ -2139,11 +2455,17 @@ let game3dRunning=false, game3dAnim=null;
 function start3DTest(){
   showScreen('screen3d');
   game3dRunning=true;
+  if(isMobileMode){
+    initMobileControls3D();
+    const h=document.getElementById('hud3d');
+    if(h)h.textContent='Джойстик — движение | Свайп справа — поворот | 🔥 — стрелять | 🦘 — прыжок';
+  }
   run3DGame();
 }
 function exit3DTest(){
   game3dRunning=false;
   if(game3dAnim)cancelAnimationFrame(game3dAnim);
+  hideMobileControls3D();
   showScreen('menuScreen');
 }
 
@@ -2233,13 +2555,16 @@ function run3DGame(){
   function onKD3d(e){keys3d[e.code]=true;if(e.code==='Space'){if(onGround){jumpVel=JUMP_FORCE;onGround=false;}shoot3d();}e.preventDefault();}
   function onKU3d(e){keys3d[e.code]=false;}
   function onMM3d(e){if(mouse3dLocked)mouse3dDX+=e.movementX*0.003;}
-  function onClick3d(){canvas.requestPointerLock();shoot3d();}
+  function onClick3d(){if(!isMobileMode){canvas.requestPointerLock();shoot3d();}}
   function onPLC(){mouse3dLocked=document.pointerLockElement===canvas;}
   document.addEventListener('keydown',onKD3d);
   document.addEventListener('keyup',onKU3d);
   document.addEventListener('mousemove',onMM3d);
   canvas.addEventListener('click',onClick3d);
   document.addEventListener('pointerlockchange',onPLC);
+  // Expose mobile functions
+  window._shoot3dFn = shoot3d;
+  window._jump3dFn = ()=>{ if(onGround){jumpVel=JUMP_FORCE;onGround=false;} };
 
   function cleanup3d(){
     document.removeEventListener('keydown',onKD3d);
@@ -2279,12 +2604,20 @@ function run3DGame(){
   function update3d(dt){
     // Controls
     player.angle+=mouse3dDX; mouse3dDX=0;
+    // Mobile look
+    if(isMobileMode && mobileLook3D.dx){player.angle+=mobileLook3D.dx*0.006;mobileLook3D.dx=0;}
     if(keys3d['KeyA']||keys3d['ArrowLeft'])player.angle-=2.2*dt;
     if(keys3d['KeyD']||keys3d['ArrowRight'])player.angle+=2.2*dt;
     const spd=3.5*dt;
     let mx=0,my=0;
     if(keys3d['KeyW']||keys3d['ArrowUp']){mx+=Math.cos(player.angle)*spd;my+=Math.sin(player.angle)*spd;}
     if(keys3d['KeyS']||keys3d['ArrowDown']){mx-=Math.cos(player.angle)*spd;my-=Math.sin(player.angle)*spd;}
+    // Mobile joystick 3D movement
+    if(isMobileMode && mobileJoy3D.active){
+      const jdx=mobileJoy3D.dx, jdy=mobileJoy3D.dy;
+      mx+=Math.cos(player.angle)*(-jdy)*spd*1.5+Math.cos(player.angle+Math.PI/2)*jdx*spd;
+      my+=Math.sin(player.angle)*(-jdy)*spd*1.5+Math.sin(player.angle+Math.PI/2)*jdx*spd;
+    }
     if(!wallAt(player.x+mx+Math.sign(mx)*0.25,player.y))player.x+=mx;
     if(!wallAt(player.x,player.y+my+Math.sign(my)*0.25))player.y+=my;
     // Jump
@@ -2582,7 +2915,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <button class="back-btn" onclick="clickSound();exit3DTest()">← ВЫХОД</button>
     <div style="background:rgba(0,0,0,0.6);border:1px solid #00ffff;border-radius:8px;padding:6px 14px;color:#00ffff;font-size:0.8rem;">🔷 3D ТЕСТ — WASD + мышь</div>
   </div>
-  <div id="hud3d" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);border:1px solid #00ffff44;border-radius:8px;padding:8px 20px;color:#aaa;font-size:0.75rem;text-align:center;">WASD — движение &nbsp;|&nbsp; мышь — поворот &nbsp;|&nbsp; ЛКМ — стрелять</div>
+  <div id="hud3d" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);border:1px solid #00ffff44;border-radius:8px;padding:8px 20px;color:#aaa;font-size:0.75rem;text-align:center;" id="hint3dEl">WASD — движение &nbsp;|&nbsp; мышь — поворот &nbsp;|&nbsp; ЛКМ — стрелять</div>
 </div>
 </body>
 </html>
