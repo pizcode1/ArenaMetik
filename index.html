@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arena ClOCO</title>
+<title>METIK ARENA</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidden;width:100vw;height:100vh;color:#fff;}
@@ -66,7 +66,7 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
 .fighter-card:hover{transform:scale(1.05);}
 .fc-locked{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
 .fc-locked-text{font-size:0.65rem;color:#aaa;text-align:center;}
-.rarity-common{border-color:#888;}.rarity-rare{border-color:#00cc44;}.rarity-megarare{border-color:#4488ff;}.rarity-epic{border-color:#cc44ff;box-shadow:0 0 8px #cc44ff44;}
+.rarity-common{border-color:#888;}.rarity-rare{border-color:#00cc44;}.rarity-megarare{border-color:#4488ff;}.rarity-epic{border-color:#cc44ff;box-shadow:0 0 8px #cc44ff44;}.rarity-legendary{border-color:#ffd700;box-shadow:0 0 10px #ffd70088;}
 .fighters-right{flex:0.3;display:flex;flex-direction:column;gap:10px;}
 .filter-block{background:rgba(0,0,0,0.4);border-radius:10px;padding:12px;}
 .filter-title{font-size:0.8rem;color:#ffd700;margin-bottom:8px;letter-spacing:2px;}
@@ -316,7 +316,7 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
 <!-- LOADING -->
 <div id="loadingScreen" class="screen active">
   <div class="jungle-bg" id="jungleBg"></div>
-  <div class="logo">🎮 ARENA ClOCO</div>
+  <div class="logo">🎮 METIK ARENA</div>
   <div class="logo-sub">3D PVP ARENA</div>
   <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
   <div class="load-text" id="loadText">Загрузка...</div>
@@ -379,7 +379,7 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
     <div class="fighter-display" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;">
       <div class="player-name-display" id="playerNameDisplay">ИГРОК</div>
       <canvas id="menuFighterCanvas" width="240" height="240" style="border-radius:15px;"></canvas>
-      <button class="btn-fight" style="margin-top:18px;" onclick="clickSound();startGame()">⚔️ БОЙ</button>
+      <button class="btn-fight" style="margin-top:18px;" onclick="clickSound();(gameMode3DSelected?start3DTest():startGame())">⚔️ БОЙ</button>
       <button class="menu-btn menu-btn-modes" style="margin-top:12px;width:220px;" onclick="clickSound();showScreen('modesScreen')">🎮 РЕЖИМЫ</button>
     </div>
   </div>
@@ -438,14 +438,14 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
     <div class="mode-card" id="modeFFA" onclick="clickSound();selectMode('ffa')">
       <div style="font-size:3rem;margin-bottom:10px;">💀</div>
       <div style="font-size:1.1rem;font-weight:900;color:#ffd700;">ПРОТИВ ВСЕХ</div>
-      <div style="font-size:0.8rem;color:#aaa;margin-top:5px;">Ты против 15 ботов</div>
+      <div style="font-size:0.8rem;color:#aaa;margin-top:5px;">Ты против 10 ботов</div>
     </div>
     <div class="mode-card" id="mode5v5" onclick="clickSound();selectMode('5v5')">
       <div style="font-size:3rem;margin-bottom:10px;">⚔️</div>
       <div style="font-size:1.1rem;font-weight:900;color:#ff9944;">5 НА 5</div>
       <div style="font-size:0.8rem;color:#aaa;margin-top:5px;">Ты + 4 бота против 5 ботов</div>
     </div>
-    <div class="mode-card" id="mode3d" onclick="clickSound();start3DTest()" style="border-color:#00ffff;">
+    <div class="mode-card" id="mode3d" onclick="clickSound();selectMode('3d')" style="border-color:#00ffff;">
       <div style="font-size:3rem;margin-bottom:10px;">🔷</div>
       <div style="font-size:1.1rem;font-weight:900;color:#00ffff;">3D ТЕСТ</div>
       <div style="font-size:0.8rem;color:#aaa;margin-top:5px;">Экспериментальный 3D режим</div>
@@ -571,6 +571,13 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
         <button id="gfxMed"  class="gfx-btn" onclick="setGfx('medium')" style="flex:1;">⚙️ Среднее</button>
         <button id="gfxHigh" class="gfx-btn" onclick="setGfx('high')" style="flex:1;">✨ Высокое</button>
         <button id="gfxEpic" class="gfx-btn" onclick="setGfx('epic')" style="flex:1;border-color:#cc44ff;color:#cc44ff;background:rgba(200,50,255,0.08);">🌟 ЭПИЧЕСКОЕ</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">🖱️ Режим управления <span id="controlModeLabel">ПК</span></div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button id="ctrlPc" class="gfx-btn" onclick="chooseDevice('pc')" style="flex:1;">🖥️ ПК</button>
+        <button id="ctrlMobile" class="gfx-btn" onclick="chooseDevice('mobile')" style="flex:1;">📱 МОБИЛЬНЫЙ</button>
       </div>
     </div>
     <button class="btn btn-gold" style="margin-top:10px;" onclick="clickSound();showScreen('menuScreen')">СОХРАНИТЬ</button>
@@ -810,7 +817,8 @@ const FIGHTERS=[
   {id:4,name:'БРЕЙК',rarity:'Редкий',rarityClass:'rarity-rare',rarityColor:'#00cc44',emoji:'🔒',hp:0,dmg:0,reload:0,ultDesc:'',ultPct:0,cls:'',speed:0,attack:'',comingSoon:'08.03.26 12:00 МСК'},
   {id:2,name:'ЧУЧА',rarity:'Мегаредкий',rarityClass:'rarity-megarare',rarityColor:'#4488ff',emoji:'🐭',hp:1180,dmg:220,reload:0.8,ultDesc:'Тёмный вихрь',ultPct:15,cls:'АТАКА',speed:108,attack:'circle'},
   {id:5,name:'НЕКСАР',rarity:'Эпический',rarityClass:'rarity-epic',rarityColor:'#cc44ff',emoji:'🧙',hp:1340,dmg:240,reload:0.6,ultDesc:'Мега-луч через всю карту (800 урона)',ultPct:8,cls:'ДАЛЬНИЙ',speed:90,attack:'nexar',ultChargeOnHit:true},
-  {id:6,name:'РЁККО',rarity:'Эпический',rarityClass:'rarity-epic',rarityColor:'#cc44ff',emoji:'⚔️',hp:1600,dmg:320,reload:0.4,ultDesc:'Вихрь клинков (урон × 3 вокруг)',ultPct:12,cls:'БЛИЖНИЙ',speed:132,attack:'melee'}
+  {id:6,name:'РЁККО',rarity:'Эпический',rarityClass:'rarity-epic',rarityColor:'#cc44ff',emoji:'⚔️',hp:1600,dmg:320,reload:0.4,ultDesc:'Вихрь клинков (урон × 3 вокруг)',ultPct:12,cls:'БЛИЖНИЙ',speed:132,attack:'melee'},
+  {id:7,name:'ВАЛЬТРИОН',rarity:'Легендарный',rarityClass:'rarity-legendary',rarityColor:'#ffd700',emoji:'🧛‍♀️',hp:1900,dmg:350,reload:0.7,ultDesc:'Громовой удар и область разрушения',ultPct:10,cls:'АТАКА',speed:95,attack:'valtrion',ultChargeOnHit:true}
 ];
 const BOT_POOL=[
   {chance:1.00,color:'#00cc44',emoji:'🟢',dmg:120,reload:1.2,mag:1,hp:350,speed:66,label:'Зеленый',special:null},
@@ -858,6 +866,7 @@ let bloodMode=Ld('bloodMode',true); // blood on by default
 let detailFighterIdx=0;
 let activeFilters={class:null,rarity:null};
 let gameMode='2v2';
+let gameMode3DSelected=false;
 let activeChestType=null;
 let particleAnim=null;
 let roundState={wins:[0,0],round:1};
@@ -1045,6 +1054,15 @@ function initSettingsUI(){
   document.getElementById('menuVolSlider').value=Math.round(menuVol*100);
   document.getElementById('btnVolLabel').textContent=Math.round(btnVol*100)+'%';
   document.getElementById('menuVolLabel').textContent=Math.round(menuVol*100)+'%';
+  // Обновляем режим управления
+  const modeLabel=document.getElementById('controlModeLabel');
+  if(modeLabel){modeLabel.textContent=isMobileMode?'МОБИЛЬНЫЙ':'ПК';}
+  const pcBtn=document.getElementById('ctrlPc');
+  const mobBtn=document.getElementById('ctrlMobile');
+  if(pcBtn&&mobBtn){
+    pcBtn.classList.toggle('active',!isMobileMode);
+    mobBtn.classList.toggle('active',isMobileMode);
+  }
 }
 function toggleFilter(t,v,btn){if(activeFilters[t]===v){activeFilters[t]=null;btn.classList.remove('active');}else{activeFilters[t]=v;btn.classList.add('active');}renderFighters();}
 function resetFilters(){activeFilters={class:null,rarity:null};document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));renderFighters();}
@@ -1082,6 +1100,7 @@ function openFighterDetail(fighterId){
     else if(f.attack==='circle') atkDesc = 'Тёмный вихрь (область)';
     else if(f.attack==='nexar') atkDesc = 'Энергетическая волна (сквозь врагов)';
     else if(f.attack==='melee') atkDesc = 'Удар клинком вблизи (мгновенный)';
+    else if(f.attack==='valtrion') atkDesc = 'Энергетический молот (2 удара по области)';
     else atkDesc = f.attack;
 
     let statsHTML =
@@ -1107,7 +1126,22 @@ function openFighterDetail(fighterId){
 }
 function sRow(l,v,m){return '<div class="stat-row">'+l+': <b>'+v+'</b><div class="stat-bar"><div class="stat-fill" style="width:'+Math.min(100,v/m*100)+'%"></div></div></div>';}
 function selectCurrentFighter(){if(!unlockedFighters.includes(detailFighterIdx))return;selectedFighter=detailFighterIdx;saveAll();document.getElementById('selectFighterBtn').textContent='✅ ВЫБРАН';}
-function selectMode(m){gameMode=m;document.getElementById('mode2v2').classList.toggle('selected',m==='2v2');document.getElementById('modeFFA').classList.toggle('selected',m==='ffa');document.getElementById('mode5v5').classList.toggle('selected',m==='5v5');}
+function selectMode(m){
+  if(m==='3d'){
+    gameMode3DSelected=true;
+  }else{
+    gameMode=m;
+    gameMode3DSelected=false;
+  }
+  document.getElementById('mode2v2').classList.toggle('selected',m==='2v2');
+  document.getElementById('modeFFA').classList.toggle('selected',m==='ffa');
+  document.getElementById('mode5v5').classList.toggle('selected',m==='5v5');
+  document.getElementById('mode3d').classList.toggle('selected',m==='3d');
+  if(m==='3d'){
+    // При выборе 3D сразу возвращаемся в меню, дальше игрок жмёт только «БОЙ»
+    showScreen('menuScreen');
+  }
+}
 
 function switchShopTab(tab,btn){document.querySelectorAll('.shop-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');['chests','daily','donate'].forEach(t=>document.getElementById('shop'+t.charAt(0).toUpperCase()+t.slice(1)).style.display=t===tab?'flex':'none');}
 function updateInvDisplay(){document.getElementById('invDisplay').innerHTML='🟩 Обычных: <b>'+chestInv.common+'</b> &nbsp; 🟦 Редких: <b>'+chestInv.rare+'</b> &nbsp; 🟡 Легендарных: <b>'+chestInv.legendary+'</b>';}
@@ -1554,6 +1588,25 @@ function startRound(){
       // Visual beam bullet (cosmetic, fast)
       bullets.push({x:player.x,y:player.y,vx:Math.cos(beamAngle)*900,vy:Math.sin(beamAngle)*900,owner:'player',dmg:0,type:'nexarbeam',color:'#cc44ff',life:1.5,r:16,isBeam:true});
     }
+    else if(selectedFighter===7){
+      // ВАЛЬТРИОН: поднимается в воздух и бьёт молнией по прямой + создаёт область разрушения
+      player.ultFlyTimer=2.0;
+      const beamAngle=player.angle;
+      const beamLen=HALF*2.2;
+      for(let d=30;d<beamLen;d+=22){
+        const bx=player.x+Math.cos(beamAngle)*d, by=player.y+Math.sin(beamAngle)*d;
+        bots.forEach(b=>{if(b.alive&&b.team==='enemy'&&Math.hypot(bx-b.x,by-b.y)<24){
+          b.hp-=800;addParticle(b.x,b.y,'#ffd700',10);
+          if(b.hp<=0){b.alive=false;kills++;document.getElementById('killCount').textContent=kills;}
+        }});
+      }
+      // Визуальная молния
+      bullets.push({x:player.x,y:player.y,vx:Math.cos(beamAngle)*950,vy:Math.sin(beamAngle)*950,owner:'player',dmg:0,type:'valtrionbeam',color:'#ffd700',life:0.8,r:18,isBeam:true});
+      // Область разрушения перед игроком
+      if(!player.valtrionZones)player.valtrionZones=[];
+      const zx=player.x+Math.cos(beamAngle)*160, zy=player.y+Math.sin(beamAngle)*160;
+      player.valtrionZones.push({x:zx,y:zy,r:120,timer:3,dmgTimer:0});
+    }
   }
 
   let bullets=[],particles=[],bloodSplatters=[];
@@ -1565,6 +1618,14 @@ function startRound(){
     if(type==='nexar'){for(let i=0;i<2;i++){const delay=i*0.15;bullets.push({x:ox,y:oy,vx:Math.cos(ang)*380,vy:Math.sin(ang)*380,owner,dmg,type:'nexar',color:'#cc44ff',life:1.4,r:14,piercing:true,piercedBots:[]});}return;}
     if(type==='melee'){// Instant melee slash — create a short-lived sweeping slash hitbox
       bullets.push({x:ox+Math.cos(ang)*35,y:oy+Math.sin(ang)*35,vx:Math.cos(ang)*60,vy:Math.sin(ang)*60,owner,dmg,type:'melee',color:'#cc44ff',life:0.18,r:38,isMelee:true});
+      return;
+    }
+    if(type==='valtrion'){
+      // Двойной удар молотом в небольшой области
+      for(let i=0;i<2;i++){
+        const phase=ang+(i===0?-0.18:0.18);
+        bullets.push({x:ox+Math.cos(phase)*40,y:oy+Math.sin(phase)*40,vx:0,vy:0,owner,dmg,type:'valtrion',color:'#ffd700',life:0.20,r:42,isMelee:true});
+      }
       return;
     }
     const cnt=type==='rect'?2:type==='stick'?3:3,spread=type==='circle'?0.22:type==='stick'?0.35:0.1;
@@ -1586,7 +1647,7 @@ function startRound(){
         <div style="width:320px;height:14px;background:rgba(0,0,0,0.5);border-radius:7px;border:2px solid #444;overflow:hidden;">
           <div id="pgLoadBar" style="height:100%;width:0%;background:linear-gradient(90deg,${won?'#ffd700,#ff9500':'#ff4444,#cc0000'});border-radius:6px;transition:width 0.05s linear;"></div>
         </div>
-        <div style="color:#666;font-size:0.75rem;margin-top:12px;letter-spacing:2px;">ARENA ClOCO</div>
+        <div style="color:#666;font-size:0.75rem;margin-top:12px;letter-spacing:2px;">METIK ARENA</div>
         <style>@keyframes pgPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}</style>
       `;
       document.body.appendChild(pgEl);
@@ -1679,6 +1740,20 @@ function startRound(){
       }
       return vz.timer>0;
     });
+    if(!player.valtrionZones)player.valtrionZones=[];
+    player.valtrionZones=player.valtrionZones.filter(z=>{
+      z.timer-=dt;z.dmgTimer-=dt;
+      if(z.dmgTimer<=0){
+        z.dmgTimer=1.0;
+        bots.forEach(b=>{if(b.alive&&b.team==='enemy'&&Math.hypot(z.x-b.x,z.y-b.y)<z.r){
+          b.hp-=150;
+          b.slowTimer=Math.max(b.slowTimer||0,1.0);
+          addParticle(b.x,b.y,'#ffdd55',4);
+          if(b.hp<=0){b.alive=false;kills++;document.getElementById('killCount').textContent=kills;}
+        }});
+      }
+      return z.timer>0;
+    });
     const tz=player.aiming?Math.min(canvas.width,canvas.height)/520:Math.min(canvas.width,canvas.height)/700;
     cam.zoom+=(tz-cam.zoom)*6*dt;cam.x+=(player.x-cam.x)*5*dt;cam.y+=(player.y-cam.y)*5*dt;
     bullets=bullets.filter(b=>{
@@ -1688,7 +1763,20 @@ function startRound(){
       if(b.owner==='player'||b.owner==='ally'){
         for(const bot of bots){if(!bot.alive||bot.team!=='enemy')continue;if(hitC(b.x,b.y,bot.x,bot.y,bot.w)){bot.hp-=b.dmg;addParticle(bot.x,bot.y,bot.color,4);if(b.owner==='player'){player.ult=Math.min(100,player.ult+player.ultPct);document.getElementById('ultBar').style.width=player.ult+'%';document.getElementById('ultNum').textContent=Math.floor(player.ult);}if(bot.hp<=0){bot.alive=false;kills++;addBloodSplatter(bot.x,bot.y);document.getElementById('killCount').textContent=kills;}if(!b.piercing)return false;if(b.piercedBots){if(b.piercedBots.includes(bot))continue;b.piercedBots.push(bot);}return true;}}
       }
-      if(b.owner==='bot'&&hitC(b.x,b.y,player.x,player.y,player.w)){player.hp-=b.dmg;addParticle(player.x,player.y,'#ff0000',4);addBloodSplatter(player.x,player.y);updateHpBar();if(player.hp<=0)endRound(false);return false;}
+      if(b.owner==='bot'&&hitC(b.x,b.y,player.x,player.y,player.w)){
+        player.hp-=b.dmg;
+        addParticle(player.x,player.y,'#ff0000',4);
+        addBloodSplatter(player.x,player.y);
+        // Ульта Валтриона заряжается и от полученного урона
+        if(selectedFighter===7){
+          player.ult=Math.min(100,player.ult+player.ultPct);
+          document.getElementById('ultBar').style.width=player.ult+'%';
+          document.getElementById('ultNum').textContent=Math.floor(player.ult);
+        }
+        updateHpBar();
+        if(player.hp<=0)endRound(false);
+        return false;
+      }
       if(b.owner==='bot'){const ally=bots.find(a=>a.team==='ally'&&a.alive);if(ally&&hitC(b.x,b.y,ally.x,ally.y,ally.w)){ally.hp-=b.dmg;return false;}}
       return true;
     });
@@ -2040,11 +2128,28 @@ function startRound(){
     ctx.globalAlpha=1;ctx.shadowBlur=0;
     walls.forEach(w=>{
       const s=w2s(w.x,w.y),ww=w.w*cam.zoom,wh=w.h*cam.zoom;
-      // Black barrier — same style on all quality levels
-      ctx.fillStyle='#000';ctx.fillRect(s.x,s.y,ww,wh);
-      ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.strokeRect(s.x,s.y,ww,wh);
-      // Subtle top highlight
-      ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fillRect(s.x,s.y,ww,Math.min(4,wh*0.2));
+      // Красные кирпичные стены
+      const brickGrad=ctx.createLinearGradient(s.x,s.y,s.x+ww,s.y+wh);
+      brickGrad.addColorStop(0,'#4a0000');
+      brickGrad.addColorStop(0.4,'#8b0000');
+      brickGrad.addColorStop(1,'#b51c1c');
+      ctx.fillStyle=brickGrad;
+      ctx.fillRect(s.x,s.y,ww,wh);
+      // Кирпичная сетка
+      ctx.strokeStyle='rgba(40,0,0,0.55)';
+      ctx.lineWidth=1;
+      const rowH=8*cam.zoom, colW=16*cam.zoom;
+      for(let y=s.y;y<=s.y+wh;y+=rowH){
+        ctx.beginPath();ctx.moveTo(s.x,y);ctx.lineTo(s.x+ww,y);ctx.stroke();
+      }
+      for(let x=s.x;x<=s.x+ww;x+=colW){
+        ctx.beginPath();ctx.moveTo(x,s.y);ctx.lineTo(x,s.y+wh);ctx.stroke();
+      }
+      // Светлый блик сверху
+      ctx.fillStyle='rgba(255,180,150,0.18)';
+      ctx.fillRect(s.x,s.y,ww,Math.min(4*cam.zoom,wh*0.25));
+      // Тёмный контур
+      ctx.strokeStyle='#2a0000';ctx.lineWidth=1.8;ctx.strokeRect(s.x,s.y,ww,wh);
     });
     ctx.globalAlpha=1;
     // Draw decor
