@@ -483,6 +483,7 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
   <button class="back-btn" style="position:absolute;top:15px;left:20px;z-index:5;" onclick="clickSound();showScreen('menuScreen')">← НАЗАД</button>
   <div class="top-right-btns" style="position:absolute;top:15px;right:20px;z-index:5;">
     <div class="straps-hud"><span class="straps-icon">💎</span><span id="strapsCountShop">0</span></div>
+    <div class="straps-hud" style="border-color:#ff9944;color:#ff9944;"><span style="font-size:1.4rem;">⚡</span><span id="powerCountShop">0</span></div>
   </div>
   <div style="font-size:2rem;color:#ffd700;margin-bottom:15px;">🛒 МАГАЗИН</div>
   <div style="display:flex;gap:10px;margin-bottom:20px;">
@@ -495,6 +496,7 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
       <div class="shop-card-icon">🟩</div>
       <div class="shop-card-title">ОБЫЧНЫЙ СУНДУК</div>
       <div class="shop-card-desc">Страпсы, жетоны силы, бойцы</div>
+      <div class="chest-rarity-bar">💎×1: 100% | ⚡5-8: 25% | ⚡12-17: 15%<br>🟢Обычный: 45% | Редкий: 12% | Мега: 3%</div>
       <div class="shop-price">💎 5 страпсов</div>
       <button class="buy-btn" onclick="clickSound();buyChest('common',5)">КУПИТЬ</button>
     </div>
@@ -502,6 +504,7 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
       <div class="shop-card-icon">🟦</div>
       <div class="shop-card-title">РЕДКИЙ СУНДУК</div>
       <div class="shop-card-desc">Много страпсов, жетоны, бойцы</div>
+      <div class="chest-rarity-bar">💎×2: 100% | 💎×4: 30% | ⚡11-18: 45%<br>⚡21-26: 20% | Редкий: 30% | Эпик: 5%</div>
       <div class="shop-price">💎 10 страпсов</div>
       <button class="buy-btn" onclick="clickSound();buyChest('rare',10)">КУПИТЬ</button>
     </div>
@@ -509,6 +512,7 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
       <div class="shop-card-icon">🟡</div>
       <div class="shop-card-title">ЛЕГЕНДАРНЫЙ СУНДУК</div>
       <div class="shop-card-desc">Редчайшие бойцы и жетоны!</div>
+      <div class="chest-rarity-bar">💎×3: 100% | 💎×8: 90% | 💎×17: 10%<br>⚡38-49: 35% | ⚡52-59: 15% | Знам: 15%</div>
       <div class="shop-price">💎 50 страпсов</div>
       <button class="buy-btn" onclick="clickSound();buyChest('legendary',50)">КУПИТЬ</button>
     </div>
@@ -527,29 +531,9 @@ body{background:#0a0a0a;font-family:'Arial Black',Arial,sans-serif;overflow:hidd
     <div class="shop-card"><div class="shop-card-icon">💎💎</div><div class="shop-card-title">150 СТРАПСОВ</div><div class="shop-price">$2.99</div><button class="buy-btn" onclick="clickSound();giveStraps(150)">КУПИТЬ</button></div>
     <div class="shop-card"><div class="shop-card-icon">💎💎💎</div><div class="shop-card-title">500 СТРАПСОВ</div><div class="shop-price">$7.99</div><button class="buy-btn" onclick="clickSound();giveStraps(500)">КУПИТЬ</button></div>
   </div>
-  <div style="margin-top:15px;background:rgba(0,0,0,0.4);border-radius:10px;padding:14px 20px;text-align:center;max-width:600px;width:90%;">
-    <div style="color:#ffd700;font-size:0.95rem;margin-bottom:14px;letter-spacing:2px;font-weight:900;">📦 МОИ СУНДУКИ</div>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <div style="background:rgba(136,136,136,0.15);border:2px solid #888;border-radius:12px;padding:12px 18px;min-width:150px;text-align:center;">
-        <div style="font-size:0.7rem;color:#888;letter-spacing:3px;margin-bottom:6px;">ОБЫЧНЫЙ</div>
-        <div style="font-size:2.2rem;margin-bottom:4px;">🟩</div>
-        <div style="font-size:1.4rem;font-weight:900;color:#aaa;margin-bottom:8px;" id="invCommonCount">0</div>
-        <button onclick="clickSound();openFromInv('common')" style="padding:6px 16px;background:linear-gradient(135deg,#556655,#334433);border:1px solid #888;border-radius:8px;color:#ccc;font-weight:900;cursor:pointer;font-size:0.78rem;letter-spacing:1px;" id="invOpenCommon">ОТКРЫТЬ</button>
-      </div>
-      <div style="background:rgba(0,200,80,0.1);border:2px solid #00cc44;border-radius:12px;padding:12px 18px;min-width:150px;text-align:center;">
-        <div style="font-size:0.7rem;color:#00cc44;letter-spacing:3px;margin-bottom:6px;">РЕДКИЙ</div>
-        <div style="font-size:2.2rem;margin-bottom:4px;">🟦</div>
-        <div style="font-size:1.4rem;font-weight:900;color:#00ff66;margin-bottom:8px;" id="invRareCount">0</div>
-        <button onclick="clickSound();openFromInv('rare')" style="padding:6px 16px;background:linear-gradient(135deg,#004422,#002211);border:1px solid #00cc44;border-radius:8px;color:#00ff88;font-weight:900;cursor:pointer;font-size:0.78rem;letter-spacing:1px;" id="invOpenRare">ОТКРЫТЬ</button>
-      </div>
-      <div style="background:rgba(255,215,0,0.08);border:2px solid #ffd700;border-radius:12px;padding:12px 18px;min-width:150px;text-align:center;">
-        <div style="font-size:0.7rem;color:#ffd700;letter-spacing:3px;margin-bottom:6px;">ЛЕГЕНДАРНЫЙ</div>
-        <div style="font-size:2.2rem;margin-bottom:4px;">🟡</div>
-        <div style="font-size:1.4rem;font-weight:900;color:#ffd700;margin-bottom:8px;" id="invLegendaryCount">0</div>
-        <button onclick="clickSound();openFromInv('legendary')" style="padding:6px 16px;background:linear-gradient(135deg,#443300,#221800);border:1px solid #ffd700;border-radius:8px;color:#ffd700;font-weight:900;cursor:pointer;font-size:0.78rem;letter-spacing:1px;" id="invOpenLegendary">ОТКРЫТЬ</button>
-      </div>
-    </div>
-    <div id="invDisplay" style="display:none;"></div>
+  <div style="margin-top:15px;background:rgba(0,0,0,0.4);border-radius:10px;padding:12px 20px;text-align:center;">
+    <div style="color:#ffd700;font-size:0.85rem;margin-bottom:8px;letter-spacing:2px;">МОИ СУНДУКИ</div>
+    <div id="invDisplay" style="font-size:0.9rem;color:#aaa;"></div>
   </div>
 </div>
 <!-- CHEST SCREEN -->
@@ -1551,16 +1535,7 @@ function selectMode(m){
 }
 
 function switchShopTab(tab,btn){document.querySelectorAll('.shop-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');['chests','daily','donate'].forEach(t=>document.getElementById('shop'+t.charAt(0).toUpperCase()+t.slice(1)).style.display=t===tab?'flex':'none');}
-function updateInvDisplay(){
-  document.getElementById('invDisplay').innerHTML='🟩 Обычных: <b>'+chestInv.common+'</b> &nbsp; 🟦 Редких: <b>'+chestInv.rare+'</b> &nbsp; 🟡 Легендарных: <b>'+chestInv.legendary+'</b>';
-  const cc=document.getElementById('invCommonCount');if(cc)cc.textContent=chestInv.common||0;
-  const cr=document.getElementById('invRareCount');if(cr)cr.textContent=chestInv.rare||0;
-  const cl=document.getElementById('invLegendaryCount');if(cl)cl.textContent=chestInv.legendary||0;
-  const btnC=document.getElementById('invOpenCommon');if(btnC){btnC.disabled=!(chestInv.common>0);btnC.style.opacity=chestInv.common>0?'1':'0.4';btnC.style.cursor=chestInv.common>0?'pointer':'not-allowed';}
-  const btnR=document.getElementById('invOpenRare');if(btnR){btnR.disabled=!(chestInv.rare>0);btnR.style.opacity=chestInv.rare>0?'1':'0.4';btnR.style.cursor=chestInv.rare>0?'pointer':'not-allowed';}
-  const btnL=document.getElementById('invOpenLegendary');if(btnL){btnL.disabled=!(chestInv.legendary>0);btnL.style.opacity=chestInv.legendary>0?'1':'0.4';btnL.style.cursor=chestInv.legendary>0?'pointer':'not-allowed';}
-}
-function openFromInv(type){if(!chestInv[type]||chestInv[type]<=0){return;}openChestAnim(type);}
+function updateInvDisplay(){document.getElementById('invDisplay').innerHTML='🟩 Обычных: <b>'+chestInv.common+'</b> &nbsp; 🟦 Редких: <b>'+chestInv.rare+'</b> &nbsp; 🟡 Легендарных: <b>'+chestInv.legendary+'</b>';}
 function buyChest(type,cost){if(straps<cost){alert('Недостаточно страпсов! 💎');return;}straps-=cost;saveAll();updateHUDs();chestInv[type]=(chestInv[type]||0)+1;saveAll();updateInvDisplay();openChestAnim(type);}
 function giveStraps(n){showPoopModal();}
 function showPoopModal(){
@@ -1756,7 +1731,7 @@ function claimTrophyReward(idx){
   if(claimedMilestones.includes(idx))return;
   const m=TROPHY_MILESTONES[idx];claimedMilestones.push(idx);saveAll();
   if(m.type==='straps')addStraps(m.amount);
-  if(m.type==='chest'){chestInv[m.chest]=(chestInv[m.chest]||0)+1;saveAll();updateInvDisplay();}
+  if(m.type==='chest'){chestInv[m.chest]=(chestInv[m.chest]||0)+1;saveAll();}
   if(m.type==='fighter'){
     const f=FIGHTERS.find(f=>f.id===m.fighterId);
     if(f){
@@ -3465,7 +3440,8 @@ function run3DGame(){
   }
 
   function render3d(){
-    const W=canvas.width,H=canvas.height;
+    // Используем логические размеры окна (не физические пиксели canvas с DPR)
+    const W=Math.floor(window.innerWidth), H=Math.floor(window.innerHeight);
     const gq=graphicsQuality; // 'low' | 'medium' | 'high' | 'epic'
     const now=Date.now();
 
@@ -4104,14 +4080,13 @@ function run3DGame(){
       ctx.fillStyle=vig;ctx.fillRect(0,0,W,H);
     }
 
-    // ── Crosshair ──
+    // ── Crosshair ── (всегда строго по центру экрана)
+    const chx=W/2, chy=H/2;
     if(gq==='low'){
       ctx.strokeStyle='#fff';ctx.lineWidth=2;
-      const chx=W/2,chy=horizon;
       ctx.beginPath();ctx.moveTo(chx-10,chy);ctx.lineTo(chx+10,chy);ctx.stroke();
       ctx.beginPath();ctx.moveTo(chx,chy-10);ctx.lineTo(chx,chy+10);ctx.stroke();
     } else if(gq==='epic'){
-      const chx=W/2,chy=horizon;
       // Outer glow ring
       ctx.globalAlpha=0.3;ctx.strokeStyle='rgba(0,255,180,0.6)';ctx.lineWidth=1;
       ctx.beginPath();ctx.arc(chx,chy,16,0,Math.PI*2);ctx.stroke();
@@ -4126,7 +4101,6 @@ function run3DGame(){
       ctx.shadowBlur=0;
     } else {
       ctx.strokeStyle='rgba(255,255,255,0.9)';ctx.lineWidth=1.5;
-      const chx=W/2,chy=horizon;
       ctx.beginPath();ctx.moveTo(chx-12,chy);ctx.lineTo(chx-4,chy);ctx.stroke();
       ctx.beginPath();ctx.moveTo(chx+4,chy);ctx.lineTo(chx+12,chy);ctx.stroke();
       ctx.beginPath();ctx.moveTo(chx,chy-12);ctx.lineTo(chx,chy-4);ctx.stroke();
@@ -4254,6 +4228,22 @@ function run3DGame(){
       show3DResult(true);
     }
   }
+
+  // Обновление canvas при изменении размера (поворот телефона, resize окна)
+  function onResize3d(){
+    const _gqR=graphicsQuality||'medium';
+    const dprR=(_gqR==='epic'||_gqR==='high')?Math.min(window.devicePixelRatio||1,2):1;
+    canvas.width=Math.floor(window.innerWidth*dprR);
+    canvas.height=Math.floor(window.innerHeight*dprR);
+    canvas.style.width='100%';canvas.style.height='100%';
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality=(_gqR==='epic'||_gqR==='high')?'high':'medium';
+    if(dprR>1){ctx.scale(dprR,dprR);}
+    render3d._mmCanvas=null;render3d._grassPts=null;render3d._auroraCanvas=null;
+  }
+  window.addEventListener('resize',onResize3d);
+  const _cleanupOrig=cleanup3d;
+  cleanup3d=function(){_cleanupOrig();window.removeEventListener('resize',onResize3d);};
 
   function loop3d(ts){
     if(!game3dRunning){cleanup3d();return;}
